@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase/firebase_service.dart';
 import 'package:flutter_firebase/widgets/auth_form.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -10,6 +11,7 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   bool isLogin = false;
+  final FirebaseService firebaseService = FirebaseService();
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -23,7 +25,15 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final onAuth = isLogin ? () {} : () {};
+    final onAuth = isLogin
+        ? () => firebaseService.onLogin(
+              email: emailController.text,
+              password: passwordController.text,
+            )
+        : () => firebaseService.onRegister(
+              email: emailController.text,
+              password: passwordController.text,
+            );
     final buttonText = isLogin ? 'Login' : 'Register';
 
     return Scaffold(

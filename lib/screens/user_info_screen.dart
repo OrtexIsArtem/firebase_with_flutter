@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase/firebase_service.dart';
 
 class UserInfoScreen extends StatelessWidget {
   const UserInfoScreen({
@@ -18,7 +19,37 @@ class UserInfoScreen extends StatelessWidget {
           children: [
             Text('User name: ${user.displayName}'),
             Text('User email: ${user.email}'),
-            Text('Email: is Verify: ${user.emailVerified}'),
+            StreamBuilder<User?>(
+              stream: FirebaseService().auth.userChanges(),
+              builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+                if (snapshot.data == null) {
+                  return Text('User not found');
+                }
+                final user = snapshot.data!;
+                user.reload();
+                if (user.emailVerified) {
+                  return Text('Email: is Verify: ${user.emailVerified}');
+                } else {
+                  return Column(
+                    children: [
+                      Text('Email: is Verify: ${user.emailVerified}'),
+                      TextButton(
+                        onPressed: () {
+                          FirebaseService().onVerifyEmail();
+                        },
+                        child: Text('Verify Email'),
+                      ),
+                    ],
+                  );
+                }
+              },
+            ),
+            TextButton(
+              onPressed: () {
+                FirebaseService().logOut();
+              },
+              child: Text('Logout'),
+            ),
           ],
         ),
       ),
